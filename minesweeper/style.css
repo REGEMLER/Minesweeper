@@ -1,0 +1,184 @@
+*{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    box-sizing: border-box;
+}
+
+:root {
+    --LightText : white;
+    --DarkText : black; 
+    --DarkBG : #232529; 
+    --LightBG : rgb(186, 179, 179);; 
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--LightBG);
+}
+
+ul,ol,li{
+    list-style: none;
+}
+
+.wrapper{
+    width: 100vw;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.header{
+    width: 80%;
+    max-height: 30vh;
+}
+
+.title{
+    width: 100%;
+    margin: 1rem auto;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.main{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.level{
+    max-width: 80%;
+    margin: 10rem auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn{
+    width: 150px;
+    height: 50px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    transition: all linear 0.5s;
+}
+
+.btn:active {
+    transform: scale(0.9);
+}
+
+.field{
+    display: grid;
+    gap: 1px;
+    border: 2px solid black;
+    padding: 1rem;
+    background-color: #ccc;
+}
+
+.field-small {
+    grid-template-columns: repeat(10, 3rem);
+}
+
+.field-mid {
+    grid-template-columns: repeat(15, 2rem);
+}
+
+.field-big {
+    grid-template-columns: repeat(25, 1.5rem);
+}
+
+.cell-small {
+    height: 3rem;
+    font-size: 1.5rem;
+}
+
+.cell-mid {
+    height: 2rem;
+    font-size: 1rem;
+}
+
+.cell-big {
+    height: 1.5rem;
+    font-size: 0.5rem;
+}
+
+.footer{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-content{
+    width: 80%;
+    margin: 1rem auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-text{
+    font-size: 1.5rem;
+}
+
+.text_light {
+    color: var(--LightText);
+}
+
+.text_dark {
+    color: var(--DarkText);
+}
+
+.bg_light{
+    background-color: #EFEFEF;
+}
+
+.bg_light:hover{
+    background-color: white;
+}
+
+.bg_dark{
+    background-color: rgb(33, 31, 31);
+}
+
+.bg_dark:hover{
+    background-color: black;
+}
+
+@media screen and (max-width:767px) {
+    .field-big {
+        grid-template-columns: repeat(25, 1rem);
+    }
+    .cell-big {
+        height: 1rem;
+        font-size: 0.5rem;
+    }
+    .field-mid {
+        grid-template-columns: repeat(15, 1.5rem);
+    }
+    .cell-mid {
+        height: 1.5rem;
+        font-size: 0.5rem;
+    }
+    .field-small {
+        grid-template-columns: repeat(10, 2rem);
+    }
+    .cell-small {
+        height: 2rem;
+        font-size: 0.5rem;
+    }
+    .footer-text{
+        font-size: 1rem;
+    }
+    .btn{
+        width: 100px;
+        height: 30px;
+        border-radius: 5px;
+    }
+}
