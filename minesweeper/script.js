@@ -1,18 +1,26 @@
-function createBody(){
-    const wrapper = document.createElement("DIV");
-    wrapper.classList.add("wrapper");
+let width; 
+let height; 
+let bombs; 
+let cellsNumber; 
+let bombIndexes;
+let cells;
+let closedCount; 
 
+function createHeader(){
     const header = document.createElement("HEADER");
     header.classList.add("header");
     const h1 = document.createElement("H1");
     h1.classList.add("title"); 
     h1.textContent = "Welcome to Minesweeper"; 
     header.append(h1); 
+    return header; 
+}
 
+function createMain(){
     const main = document.createElement("MAIN");
     main.classList.add("main"); 
     const mainDescription = document.createElement("H2");
-    mainDescription.classList.add("footer-text");
+    mainDescription.classList.add("main-description");
     mainDescription.textContent = "select level of the game 10/10 20/20 30/30";
     const levels = document.createElement("DIV");
     levels.classList.add("level");
@@ -30,7 +38,13 @@ function createBody(){
     levels.append(hardButton);
     main.append(mainDescription);
     main.append(levels);
+    easyButton.addEventListener("click", createEasyGame);
+    mediumButton.addEventListener("click", createMediumGame);
+    hardButton.addEventListener("click", createHardGame);
+    return main; 
+}
 
+function createFooter(){
     const footer = document.createElement("FOOTER");
     footer.classList.add("footer"); 
     const footerContent = document.createElement("DIV");
@@ -38,19 +52,28 @@ function createBody(){
     const time = document.createElement("H2");
     time.classList.add("footer-text");
     time.textContent = "Time: 00sec";
-    const bombs = document.createElement("H2");
-    bombs.classList.add("footer-text");
-    bombs.textContent = "Bombs left: 30";
+    const bombsText = document.createElement("H2");
+    bombsText.classList.add("footer-text");
+    bombsText.textContent = "Bombs left: 30";
     const footerButton = document.createElement("BUTTON"); 
     footerButton.classList.add("btn");
     footerButton.classList.add("text_dark");
     footerButton.classList.add("bg_light");
     footerButton.textContent = "Restart"; 
     footerContent.append(time);
-    footerContent.append(bombs);
+    footerContent.append(bombsText);
     footer.append(footerContent);
     footer.append(footerButton);
+    footerButton.addEventListener("click", restartGame);
+    return footer;
+}
 
+function createBody(){
+    const wrapper = document.createElement("DIV");
+    wrapper.classList.add("wrapper");
+    const header = createHeader();
+    const main = createMain();
+    const footer = createFooter();
     wrapper.append(header);
     wrapper.append(main);
     wrapper.append(footer);
@@ -59,25 +82,52 @@ function createBody(){
 
 createBody()
 
+function createGame(w, h, bombs, cellClass, classField) {
+    width = w; 
+    height = h; 
+    bombs = bombs; 
+    cellsNumber = width*height; 
+    bombIndexes = [...Array(cellsNumber).keys()].sort(() => Math.random() - 0.5).slice(0, bombs);
+    closedCount = cellsNumber; 
+    const field = document.createElement("DIV");
+    field.classList.add("field"); 
+    field.classList.add(classField);
+    const mainDescription = document.querySelector(".main-description");
+    mainDescription.remove();
+    const levels = document.querySelector(".level");
+    levels.remove();
+    const main = document.querySelector(".main");
+    main.append(field);
+    for(let i = 0; i < cellsNumber; i++) {
+        const btn = document.createElement("BUTTON");
+        btn.classList.add("cell");
+        btn.classList.add(cellClass);
+        field.append(btn); 
+    }
+    cells = [...field.children];
+    field.addEventListener("click", minesweeper);
+}
 
-// const field = document.getElementById("field");
+function createEasyGame(){
+    createGame(10, 10, 10, "cell-small", "field-small")
+}
 
-// for(let i = 0; i < 100; i++) {
-//     const btn = document.createElement("BUTTON");
-//     btn.classList.add("cell-small");
-//     field.append(btn); 
-// }
+function createMediumGame(){
+    createGame(15, 15, 15, "cell-mid", "field-mid")
+}
 
-// let width = 10; 
-// let height = 10; 
-// let bombs = 10; 
-// let cellsNumber = width*height; 
-// let bombIndexes = [...Array(cellsNumber).keys()].sort(() => Math.random() - 0.5).slice(0, bombs);
-// let cells = [...field.children];
-// let closedCount = cellsNumber; 
+function createHardGame(){
+    createGame(25, 25, 25, "cell-big", "field-big")
+}
 
 function isValid(row, column){
     return row >= 0 && row < height && column >= 0 && column < width; 
+}
+
+function restartGame(){
+    const oldMain = document.querySelector(".main");
+    const newMain = createMain();
+    oldMain.replaceWith(newMain)
 }
 
 function isBomb(row, column) {
@@ -97,7 +147,6 @@ function getCount(row, column) {
     }
     return count; 
 }
-
 
 function open(row, column) {
     if(!isValid(row, column)) return; 
@@ -132,8 +181,7 @@ function open(row, column) {
     }
 }
 
-
-function handler(event) {
+function minesweeper(event) {
     if(event.target.tagName !== "BUTTON") {
         return; 
     }
@@ -142,5 +190,3 @@ function handler(event) {
     const row = Math.floor(clickIndex / width); 
     open(row, column);
 }
-
-// field.addEventListener("click", handler);

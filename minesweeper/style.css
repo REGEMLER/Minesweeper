@@ -14,7 +14,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--LightBG);
+    background-color: #7e86b4;
 }
 
 ul,ol,li{
@@ -48,6 +48,12 @@ ul,ol,li{
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.main-description{
+    font-weight: 400;
+    font-size: 20px;
+    font-style: italic;
 }
 
 .level{
@@ -90,6 +96,15 @@ ul,ol,li{
 
 .field-big {
     grid-template-columns: repeat(25, 1.5rem);
+}
+
+.cell{
+    color: aqua;
+}
+
+.cell:disabled{
+    opacity: 1;
+    color: aqua;
 }
 
 .cell-small {
