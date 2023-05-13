@@ -4,6 +4,8 @@ let bombs;
 let cellsNumber; 
 let bombIndexes;
 let cells;
+let step = 0;
+let seconds = 0;
 let closedCount; 
 
 function createHeader(){
@@ -19,9 +21,12 @@ function createHeader(){
 function createMain(){
     const main = document.createElement("MAIN");
     main.classList.add("main"); 
+    const field = createGame(10, 10, 10, "cell-small", "field-small");
+    const mainContainer = document.createElement("DIV");
+    mainContainer.classList.add("main-container")
     const mainDescription = document.createElement("H2");
     mainDescription.classList.add("main-description");
-    mainDescription.textContent = "select level of the game 10/10 20/20 30/30";
+    mainDescription.textContent = "Select level and the number of bombs";
     const levels = document.createElement("DIV");
     levels.classList.add("level");
     const easyButton = document.createElement("BUTTON"); 
@@ -33,14 +38,21 @@ function createMain(){
     const hardButton = document.createElement("BUTTON"); 
     hardButton.classList.add("btn");
     hardButton.textContent = "Hard";
+    const inputBombs = document.createElement("INPUT");
+    inputBombs.setAttribute("type", "number");
+    inputBombs.setAttribute("placeholder", "bombs");
+    inputBombs.setAttribute("min", "10");
+    inputBombs.setAttribute("max", "99");
+    inputBombs.classList.add("input-bombs");
     levels.append(easyButton);
     levels.append(mediumButton);
     levels.append(hardButton);
-    main.append(mainDescription);
-    main.append(levels);
-    easyButton.addEventListener("click", createEasyGame);
-    mediumButton.addEventListener("click", createMediumGame);
-    hardButton.addEventListener("click", createHardGame);
+    levels.append(inputBombs);
+    mainContainer.append(mainDescription);
+    mainContainer.append(levels);
+    main.append(mainContainer);
+    main.append(field);
+    levels.addEventListener("click", changeLevel);
     return main; 
 }
 
@@ -51,16 +63,20 @@ function createFooter(){
     footerContent.classList.add("footer-content");
     const time = document.createElement("H2");
     time.classList.add("footer-text");
-    time.textContent = "Time: 00sec";
+    time.textContent = `Time: ${seconds}sec`;
     const bombsText = document.createElement("H2");
     bombsText.classList.add("footer-text");
-    bombsText.textContent = "Bombs left: 30";
+    bombsText.textContent = `Bombs left: 0`;
+    const clicks = document.createElement("H2");
+    clicks.classList.add("footer-text");
+    clicks.textContent = `Clicks: ${step}`;
     const footerButton = document.createElement("BUTTON"); 
     footerButton.classList.add("btn");
     footerButton.classList.add("text_dark");
     footerButton.classList.add("bg_light");
     footerButton.textContent = "Restart"; 
     footerContent.append(time);
+    footerContent.append(clicks);
     footerContent.append(bombsText);
     footer.append(footerContent);
     footer.append(footerButton);
@@ -92,12 +108,6 @@ function createGame(w, h, bombs, cellClass, classField) {
     const field = document.createElement("DIV");
     field.classList.add("field"); 
     field.classList.add(classField);
-    const mainDescription = document.querySelector(".main-description");
-    mainDescription.remove();
-    const levels = document.querySelector(".level");
-    levels.remove();
-    const main = document.querySelector(".main");
-    main.append(field);
     for(let i = 0; i < cellsNumber; i++) {
         const btn = document.createElement("BUTTON");
         btn.classList.add("cell");
@@ -106,18 +116,53 @@ function createGame(w, h, bombs, cellClass, classField) {
     }
     cells = [...field.children];
     field.addEventListener("click", minesweeper);
+    return field; 
 }
 
-function createEasyGame(){
-    createGame(10, 10, 10, "cell-small", "field-small")
+function changeLevel(event){
+    if(event.target.tagName !== "BUTTON"){
+        return;
+    }
+    let inputBombs = document.querySelector(".input-bombs").value; 
+    let newField;
+    if(!inputBombs){
+        if(event.target.textContent ==="Easy"){
+            newField =  createGame(10, 10, 10, "cell-small", "field-small");
+        } else if(event.target.textContent ==="Hard"){
+            newField = createGame(25, 25, 25, "cell-big", "field-big");
+        } else {
+            newField = createGame(15, 15, 15, "cell-mid", "field-mid");
+        }
+    } else {
+        if(inputBombs < 10 || inputBombs > 99){
+            createModal("Number of bombs must be in range from 10 to 99!")
+            return
+        }
+        if(event.target.textContent ==="Easy"){
+            newField =  createGame(10, inputBombs, 10, "cell-small", "field-small");
+        } else if(event.target.textContent ==="Hard"){
+            newField = createGame(25, inputBombs, 25, "cell-big", "field-big");
+        } else {
+            newField = createGame(15, inputBombs, 15, "cell-mid", "field-mid");
+        }
+    }
+    const oldField = document.querySelector(".field");
+    oldField.replaceWith(newField);
 }
 
-function createMediumGame(){
-    createGame(15, 15, 15, "cell-mid", "field-mid")
-}
-
-function createHardGame(){
-    createGame(25, 25, 25, "cell-big", "field-big")
+function createModal(text, isGood){
+    const modal = document.createElement("DIV");
+    modal.classList.add("modal");
+    modal.textContent = text;
+    if(isGood){
+        modal.classList.add("modal_good");
+    } else {
+        modal.classList.add("modal_bad");
+    }
+    document.body.append(modal);
+    modal.addEventListener("click", () => {
+        modal.remove();
+    })
 }
 
 function isValid(row, column){
@@ -127,7 +172,7 @@ function isValid(row, column){
 function restartGame(){
     const oldMain = document.querySelector(".main");
     const newMain = createMain();
-    oldMain.replaceWith(newMain)
+    oldMain.replaceWith(newMain);
 }
 
 function isBomb(row, column) {
