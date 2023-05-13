@@ -79,8 +79,9 @@ ul,ol,li{
 .input-bombs{
     width: 150px;
     height: 50px;
-    font-size: 1rem;
+    font-size: 1.2rem;
     border-radius: 5px;
+    text-align: center;
 }
 
 .input-bombs::placeholder{
@@ -113,13 +114,25 @@ ul,ol,li{
     grid-template-columns: repeat(25, 1.5rem);
 }
 
-.cell{
+.bomb{
+    opacity: 1;
     color: aqua;
 }
 
-.cell:disabled{
-    opacity: 1;
-    color: aqua;
+.cell-1{
+    color: blue;
+}
+
+.cell-2{
+    color: green;
+}
+
+.cell-3{
+    color: red;
+}
+
+.cell-4{
+    color: orange;
 }
 
 .cell-small {
@@ -134,7 +147,7 @@ ul,ol,li{
 
 .cell-big {
     height: 1.5rem;
-    font-size: 0.5rem;
+    font-size: 1rem;
 }
 
 .footer{
@@ -226,7 +239,7 @@ ul,ol,li{
     }
     .cell-big {
         height: 1rem;
-        font-size: 0.5rem;
+        font-size: 1rem;
     }
     .field-mid {
         grid-template-columns: repeat(15, 1.5rem);

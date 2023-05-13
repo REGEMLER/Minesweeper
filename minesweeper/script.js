@@ -2,12 +2,13 @@ let width = 10;
 let height = 10; 
 let bombs = 10; 
 let amountOfCells = width*height; 
-let bombIndexesArray;
-let cells;
+let bombIndexesArray = [];
+let cells = [];
 let step = 0;
 let seconds = 0;
 let closedCells = amountOfCells; 
 let isDarkTheme = true; 
+let timerId = null; 
 
 function createHeader(){
     const header = document.createElement("HEADER");
@@ -45,6 +46,7 @@ function createMain(){
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
     inputBombs.classList.add("input-bombs");
+    inputBombs.value = "10";
     levels.append(easyButton);
     levels.append(mediumButton);
     levels.append(hardButton);
@@ -65,12 +67,12 @@ function createFooter(){
     const time = document.createElement("H2");
     time.classList.add("footer-text");
     time.classList.add("text");
-    time.textContent = `Time: ${seconds}sec`;
+    time.textContent = `Time: ${seconds} sec`;
     time.id = "time";
     const bombsText = document.createElement("H2");
     bombsText.classList.add("footer-text");
     bombsText.classList.add("text");
-    bombsText.textContent = `Bombs left: 0`;
+    bombsText.textContent = `Bombs left: ${bombs}`;
     bombsText.id = "bombsText";
     const clicks = document.createElement("H2");
     clicks.classList.add("footer-text");
@@ -127,8 +129,14 @@ function createGame(w, h, b, cellClass, classField) {
         btn.classList.add(cellClass);
         field.append(btn); 
     }
+    if(cells.length) cells.length = 0; 
     cells = [...field.children];
     field.addEventListener("click", minesweeper);
+    timerId = setInterval(() => {
+        const time = document.getElementById("time");
+        seconds++
+        time.textContent = `Time: ${seconds} sec`;
+    }, 1000);
     return field; 
 }
 
@@ -138,6 +146,7 @@ function changeLevel(event){
     }
     let inputBombs = document.querySelector(".input-bombs").value; 
     let newField;
+    stopTimer()
     if(!inputBombs){
         if(event.target.textContent ==="Easy"){
             newField =  createGame(10, 10, 10, "cell-small", "field-small");
@@ -151,16 +160,19 @@ function changeLevel(event){
             createModal("Number of bombs must be in range from 10 to 99!")
             return
         }
+        bombs = +inputBombs;
         if(event.target.textContent ==="Easy"){
-            newField =  createGame(10, inputBombs, 10, "cell-small", "field-small");
+            newField =  createGame(10, 10, bombs, "cell-small", "field-small");
         } else if(event.target.textContent ==="Hard"){
-            newField = createGame(25, inputBombs, 25, "cell-big", "field-big");
+            newField = createGame(25, 25, bombs, "cell-big", "field-big");
         } else {
-            newField = createGame(15, inputBombs, 15, "cell-mid", "field-mid");
+            newField = createGame(15, 15, bombs, "cell-mid", "field-mid");
         }
     }
     const clicks = document.getElementById("clicks");
     clicks.textContent = `Clicks: ${step}`;
+    const bombsText = document.getElementById("bombsText");
+    bombsText.textContent = `Bombs left: ${bombs}`;
     const oldField = document.querySelector(".field");
     oldField.replaceWith(newField);
 }
@@ -180,14 +192,19 @@ function createModal(text, isGood){
     })
 }
 
+function stopTimer(){
+    clearInterval(timerId);
+    const time = document.getElementById("time");
+    seconds = 0;
+    time.textContent = `Time: ${seconds} sec`;
+}
+
 function isValid(row, column){
     return row >= 0 && row < height && column >= 0 && column < width; 
 }
 
 function restartGame(){
-    const oldMain = document.querySelector(".main");
-    const newMain = createMain();
-    oldMain.replaceWith(newMain);
+    stopTimer();
 }
 
 function isBomb(row, column) {
@@ -219,18 +236,30 @@ function open(row, column) {
     cell.disabled = true;
     if(isBomb(row, column)){
         cell.textContent = "💣";
-        alert("you lose");
+        cell.classList.add("bomb");
+        stopTimer();
+        createModal(`Game over! You lose! Try again!`);
         return; 
     }
 
     closedCells--;
     if(closedCells <= bombs) {
-        alert("you win");
+        stopTimer();
+        createModal(`Game over! You win for ${seconds} seconds and ${step} times!`, true);
         return; 
     }
     const count = getCount(row, column); 
     if(count !== 0){ 
         cell.textContent = count;
+        if(count === 1) {
+            cell.classList.add("cell-1");
+        } else if(count === 2) {
+            cell.classList.add("cell-2");
+        } else if (count === 3){
+            cell.classList.add("cell-3");
+        } else if(count === 4){
+            cell.classList.add("cell-4");
+        }
         return; 
     }
     for(let i = -1; i <= 1; i++) {
@@ -246,10 +275,10 @@ function minesweeper(event) {
     }
     const clickIndex = cells.indexOf(event.target); 
     if(step === 0){
+        if( bombIndexesArray.length) bombIndexesArray.length = 0; 
         const arrWithoutFirstClick = [...Array(amountOfCells).keys()];
         arrWithoutFirstClick.splice(clickIndex, 1);
         bombIndexesArray = arrWithoutFirstClick.sort(() => Math.random() - 0.5).slice(0, bombs);
-        console.log(bombs)
     }
     const column = clickIndex % width; 
     const row = Math.floor(clickIndex / width); 
@@ -268,6 +297,8 @@ function toggleTheme(){
         document.body.style.backgroundColor = "#7e86b4";
         input.classList.remove("bg_light");
         input.classList.add("bg_dark");
+        input.classList.remove("text_dark");
+        input.classList.add("text_light");
         btns.forEach(item => {
             item.classList.remove("text_dark");
             item.classList.add("text_light");
@@ -284,6 +315,8 @@ function toggleTheme(){
         document.body.style.backgroundColor = "#232529";
         input.classList.add("bg_light");
         input.classList.remove("bg_dark");
+        input.classList.add("text_dark");
+        input.classList.remove("text_light");
         btns.forEach(item => {
             item.classList.add("text_dark");
             item.classList.remove("text_light");
