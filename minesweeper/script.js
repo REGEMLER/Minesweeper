@@ -1,12 +1,12 @@
-let width; 
-let height; 
-let bombs; 
-let cellsNumber; 
-let bombIndexes;
+let width = 10; 
+let height = 10; 
+let bombs = 10; 
+let amountOfCells = width*height; 
+let bombIndexesArray;
 let cells;
 let step = 0;
 let seconds = 0;
-let closedCount; 
+let closedCells = amountOfCells; 
 
 function createHeader(){
     const header = document.createElement("HEADER");
@@ -64,12 +64,15 @@ function createFooter(){
     const time = document.createElement("H2");
     time.classList.add("footer-text");
     time.textContent = `Time: ${seconds}sec`;
+    time.id = "time";
     const bombsText = document.createElement("H2");
     bombsText.classList.add("footer-text");
     bombsText.textContent = `Bombs left: 0`;
+    bombsText.id = "bombsText";
     const clicks = document.createElement("H2");
     clicks.classList.add("footer-text");
     clicks.textContent = `Clicks: ${step}`;
+    clicks.id = "clicks";
     const footerButton = document.createElement("BUTTON"); 
     footerButton.classList.add("btn");
     footerButton.classList.add("text_dark");
@@ -98,17 +101,17 @@ function createBody(){
 
 createBody()
 
-function createGame(w, h, bombs, cellClass, classField) {
+function createGame(w, h, b, cellClass, classField) {
     width = w; 
     height = h; 
-    bombs = bombs; 
-    cellsNumber = width*height; 
-    bombIndexes = [...Array(cellsNumber).keys()].sort(() => Math.random() - 0.5).slice(0, bombs);
-    closedCount = cellsNumber; 
+    bombs = b; 
+    amountOfCells = width*height; 
+    closedCells = amountOfCells; 
+    step = 0;
     const field = document.createElement("DIV");
     field.classList.add("field"); 
     field.classList.add(classField);
-    for(let i = 0; i < cellsNumber; i++) {
+    for(let i = 0; i < amountOfCells; i++) {
         const btn = document.createElement("BUTTON");
         btn.classList.add("cell");
         btn.classList.add(cellClass);
@@ -146,6 +149,8 @@ function changeLevel(event){
             newField = createGame(15, inputBombs, 15, "cell-mid", "field-mid");
         }
     }
+    const clicks = document.getElementById("clicks");
+    clicks.textContent = `Clicks: ${step}`;
     const oldField = document.querySelector(".field");
     oldField.replaceWith(newField);
 }
@@ -178,7 +183,7 @@ function restartGame(){
 function isBomb(row, column) {
     if(!isValid(row, column)) return; 
     const clickedIndex = row * width + column;
-    return bombIndexes.includes(clickedIndex); 
+    return bombIndexesArray.includes(clickedIndex); 
 }
 
 function getCount(row, column) {
@@ -202,15 +207,14 @@ function open(row, column) {
     if(cell.disabled === true) return;
 
     cell.disabled = true;
-
     if(isBomb(row, column)){
         cell.textContent = "💣";
         alert("you lose");
         return; 
     }
 
-    closedCount--;
-    if(closedCount <= bombs) {
+    closedCells--;
+    if(closedCells <= bombs) {
         alert("you win");
         return; 
     }
@@ -231,7 +235,16 @@ function minesweeper(event) {
         return; 
     }
     const clickIndex = cells.indexOf(event.target); 
+    if(step === 0){
+        const arrWithoutFirstClick = [...Array(amountOfCells).keys()];
+        arrWithoutFirstClick.splice(clickIndex, 1);
+        bombIndexesArray = arrWithoutFirstClick.sort(() => Math.random() - 0.5).slice(0, bombs);
+        console.log(bombs)
+    }
     const column = clickIndex % width; 
     const row = Math.floor(clickIndex / width); 
     open(row, column);
+    step++;
+    const clicks = document.getElementById("clicks");
+    clicks.textContent = `Clicks: ${step}`;
 }
