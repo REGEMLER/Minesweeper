@@ -7,12 +7,14 @@ let cells;
 let step = 0;
 let seconds = 0;
 let closedCells = amountOfCells; 
+let isDarkTheme = true; 
 
 function createHeader(){
     const header = document.createElement("HEADER");
     header.classList.add("header");
     const h1 = document.createElement("H1");
     h1.classList.add("title"); 
+    h1.classList.add("text"); 
     h1.textContent = "Welcome to Minesweeper"; 
     header.append(h1); 
     return header; 
@@ -26,6 +28,7 @@ function createMain(){
     mainContainer.classList.add("main-container")
     const mainDescription = document.createElement("H2");
     mainDescription.classList.add("main-description");
+    mainDescription.classList.add("text");
     mainDescription.textContent = "Select level and the number of bombs";
     const levels = document.createElement("DIV");
     levels.classList.add("level");
@@ -41,8 +44,6 @@ function createMain(){
     const inputBombs = document.createElement("INPUT");
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
-    inputBombs.setAttribute("min", "10");
-    inputBombs.setAttribute("max", "99");
     inputBombs.classList.add("input-bombs");
     levels.append(easyButton);
     levels.append(mediumButton);
@@ -63,20 +64,21 @@ function createFooter(){
     footerContent.classList.add("footer-content");
     const time = document.createElement("H2");
     time.classList.add("footer-text");
+    time.classList.add("text");
     time.textContent = `Time: ${seconds}sec`;
     time.id = "time";
     const bombsText = document.createElement("H2");
     bombsText.classList.add("footer-text");
+    bombsText.classList.add("text");
     bombsText.textContent = `Bombs left: 0`;
     bombsText.id = "bombsText";
     const clicks = document.createElement("H2");
     clicks.classList.add("footer-text");
+    clicks.classList.add("text");
     clicks.textContent = `Clicks: ${step}`;
     clicks.id = "clicks";
     const footerButton = document.createElement("BUTTON"); 
     footerButton.classList.add("btn");
-    footerButton.classList.add("text_dark");
-    footerButton.classList.add("bg_light");
     footerButton.textContent = "Restart"; 
     footerContent.append(time);
     footerContent.append(clicks);
@@ -90,6 +92,12 @@ function createFooter(){
 function createBody(){
     const wrapper = document.createElement("DIV");
     wrapper.classList.add("wrapper");
+    const theme = document.createElement("DIV");
+    const img = document.createElement("IMG");
+    img.src = "free-icon-sun-5903519.png";
+    theme.classList.add("theme"); 
+    theme.append(img);
+    theme.addEventListener("click", toggleTheme)
     const header = createHeader();
     const main = createMain();
     const footer = createFooter();
@@ -97,6 +105,8 @@ function createBody(){
     wrapper.append(main);
     wrapper.append(footer);
     document.body.prepend(wrapper); 
+    document.body.prepend(theme); 
+    toggleTheme()
 }
 
 createBody()
@@ -247,4 +257,44 @@ function minesweeper(event) {
     step++;
     const clicks = document.getElementById("clicks");
     clicks.textContent = `Clicks: ${step}`;
+}
+
+function toggleTheme(){
+    const icon = document.querySelector(".theme");
+    const btns = [...document.querySelectorAll(".btn")];
+    const texts = [...document.querySelectorAll(".text")];
+    const input = document.querySelector(".input-bombs");
+    if(isDarkTheme){
+        document.body.style.backgroundColor = "#7e86b4";
+        input.classList.remove("bg_light");
+        input.classList.add("bg_dark");
+        btns.forEach(item => {
+            item.classList.remove("text_dark");
+            item.classList.add("text_light");
+            item.classList.remove("bg_light");
+            item.classList.add("bg_dark");
+        })
+        texts.forEach(item => {
+            item.classList.add("text_dark");
+            item.classList.remove("text_light");
+        })
+        isDarkTheme = false;
+        icon.firstElementChild.src = "free-icon-sun-5903519.png";
+    } else {
+        document.body.style.backgroundColor = "#232529";
+        input.classList.add("bg_light");
+        input.classList.remove("bg_dark");
+        btns.forEach(item => {
+            item.classList.add("text_dark");
+            item.classList.remove("text_light");
+            item.classList.add("bg_light");
+            item.classList.remove("bg_dark");
+        })
+        texts.forEach(item => {
+            item.classList.remove("text_dark");
+            item.classList.add("text_light");
+        })
+        isDarkTheme = true;
+        icon.firstElementChild.src = "free-icon-moon-4139157.png";
+    }
 }

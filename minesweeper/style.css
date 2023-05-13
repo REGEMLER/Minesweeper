@@ -9,7 +9,8 @@
     --LightText : white;
     --DarkText : black; 
     --DarkBG : #232529; 
-    --LightBG : rgb(186, 179, 179);; 
+    --LightkBG : #7e86b4;; 
+    --sec : rgb(186, 179, 179);; 
 }
 
 body {
@@ -50,10 +51,6 @@ ul,ol,li{
     align-items: center;
 }
 
-.main-container{
-    flex-shrink: 2;
-}
-
 .main-description{
     font-weight: 400;
     font-size: 20px;
@@ -73,7 +70,7 @@ ul,ol,li{
 .btn{
     width: 150px;
     height: 50px;
-    font-size: 1rem;
+    font-size: 1.2rem;
     border: none;
     border-radius: 5px;
     transition: all linear 0.5s;
@@ -88,6 +85,8 @@ ul,ol,li{
 
 .input-bombs::placeholder{
     text-align: center;
+    color: #ccc;
+    font-weight: 900;
 }
 
 .btn:active {
@@ -99,7 +98,7 @@ ul,ol,li{
     gap: 1px;
     border: 2px solid black;
     padding: 1rem;
-    background-color: #ccc;
+    background-color: #2b2424;
 }
 
 .field-small {
@@ -156,6 +155,20 @@ ul,ol,li{
 
 .footer-text{
     font-size: 1.5rem;
+}
+
+.theme{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    position: fixed;
+    top: 5%;
+    right: 5%;
+}
+
+.theme img{
+    width: 100%;
+    height: 100%;
 }
 
 .text_light {
