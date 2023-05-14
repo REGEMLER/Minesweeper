@@ -46,7 +46,6 @@ function createMain(){
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
     inputBombs.classList.add("input-bombs");
-    inputBombs.value = "10";
     levels.append(easyButton);
     levels.append(mediumButton);
     levels.append(hardButton);
@@ -99,7 +98,7 @@ function createBody(){
     img.src = "free-icon-sun-5903519.png";
     theme.classList.add("theme"); 
     theme.append(img);
-    theme.addEventListener("click", toggleTheme)
+    theme.addEventListener("click", toggleTheme);
     const header = createHeader();
     const main = createMain();
     const footer = createFooter();
@@ -131,12 +130,15 @@ function createGame(w, h, b, cellClass, classField) {
     }
     if(cells.length) cells.length = 0; 
     cells = [...field.children];
+
     field.addEventListener("click", minesweeper);
+
     timerId = setInterval(() => {
         const time = document.getElementById("time");
         seconds++
         time.textContent = `Time: ${seconds} sec`;
     }, 1000);
+
     return field; 
 }
 
@@ -146,7 +148,7 @@ function changeLevel(event){
     }
     let inputBombs = document.querySelector(".input-bombs").value; 
     let newField;
-    stopTimer()
+    stopTimer();
     if(!inputBombs){
         if(event.target.textContent ==="Easy"){
             newField =  createGame(10, 10, 10, "cell-small", "field-small");
@@ -157,8 +159,8 @@ function changeLevel(event){
         }
     } else {
         if(inputBombs < 10 || inputBombs > 99){
-            createModal("Number of bombs must be in range from 10 to 99!")
-            return
+            createModal("Number of bombs must be in range from 10 to 99!");
+            return;
         }
         bombs = +inputBombs;
         if(event.target.textContent ==="Easy"){
@@ -205,6 +207,21 @@ function isValid(row, column){
 
 function restartGame(){
     stopTimer();
+    const field = document.querySelector(".field");
+    const level = field.classList[1];
+    let newField;
+    if(level ==="field-small"){
+        newField =  createGame(10, 10, bombs, "cell-small", "field-small");
+    } else if(level ==="field-big"){
+        newField = createGame(25, 25, bombs, "cell-big", "field-big");
+    } else {
+        newField = createGame(15, 15, bombs, "cell-mid", "field-mid");
+    }
+    const clicks = document.getElementById("clicks");
+    clicks.textContent = `Clicks: ${step}`;
+    const bombsText = document.getElementById("bombsText");
+    bombsText.textContent = `Bombs left: ${bombs}`;
+    field.replaceWith(newField);
 }
 
 function isBomb(row, column) {
@@ -239,6 +256,8 @@ function open(row, column) {
         cell.classList.add("bomb");
         stopTimer();
         createModal(`Game over! You lose! Try again!`);
+        const field = document.querySelector(".field");
+        field.removeEventListener("click", minesweeper);
         return; 
     }
 
@@ -246,6 +265,8 @@ function open(row, column) {
     if(closedCells <= bombs) {
         stopTimer();
         createModal(`Game over! You win for ${seconds} seconds and ${step} times!`, true);
+        const field = document.querySelector(".field");
+        field.removeEventListener("click", minesweeper);
         return; 
     }
     const count = getCount(row, column); 
