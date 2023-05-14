@@ -119,6 +119,7 @@ function createBody(){
     document.body.prepend(theme); 
 
     toggleTheme();
+    sound("start.mp3");
 }
 
 createBody();
@@ -192,6 +193,7 @@ function setLevel(level){
     const bombsText = document.getElementById("bombsText");
     bombsText.textContent = `Bombs left: ${bombs}`;
     field.replaceWith(newField);
+    sound("start.mp3");
 }
 
 // Функции и дополнительные функции которые срабатывают при ЛКМ или ПКМ
@@ -241,6 +243,7 @@ function open(row, column) {
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
         field.removeEventListener("contextmenu", markBomb);
+        sound("lose.mp3");
         return; 
     }
 
@@ -251,6 +254,7 @@ function open(row, column) {
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
         field.removeEventListener("contextmenu", markBomb);
+        sound("win.mp3");
         return; 
     }
     const count = getCount(row, column); 
@@ -278,6 +282,7 @@ function minesweeper(event) {
     if(event.target.tagName !== "BUTTON") {
         return; 
     }
+    sound("click.mp3");
     const clickIndex = cells.indexOf(event.target); 
     if(step === 0){
         if( bombIndexesArray.length) bombIndexesArray.length = 0; 
@@ -299,6 +304,7 @@ function markBomb(event){
         return; 
     }
     event.preventDefault();
+    sound("flag.mp3");
     const clickIndex = cells.indexOf(event.target); 
     const cell = cells[clickIndex]; 
     if(cell.disabled === true) {
@@ -382,4 +388,10 @@ function createModal(text, isGood){
         const wrapper = document.querySelector(".wrapper");
         wrapper.style.opacity = "1";
     })
+}
+
+function sound(src){
+    const audio = new Audio();
+    audio.src = src;
+    audio.play(); 
 }
