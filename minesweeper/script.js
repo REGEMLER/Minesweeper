@@ -1,3 +1,4 @@
+// Глобальные переменные 
 let width = 10; 
 let height = 10; 
 let bombs = 10; 
@@ -10,6 +11,7 @@ let closedCells = amountOfCells;
 let isDarkTheme = true; 
 let timerId = null; 
 
+// Создание разметки 
 function createHeader(){
     const header = document.createElement("HEADER");
     header.classList.add("header");
@@ -24,7 +26,9 @@ function createHeader(){
 function createMain(){
     const main = document.createElement("MAIN");
     main.classList.add("main"); 
+
     const field = createGame(10, 10, 10, "cell-small", "field-small");
+
     const mainContainer = document.createElement("DIV");
     mainContainer.classList.add("main-container")
     const mainDescription = document.createElement("H2");
@@ -46,6 +50,7 @@ function createMain(){
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
     inputBombs.classList.add("input-bombs");
+
     levels.append(easyButton);
     levels.append(mediumButton);
     levels.append(hardButton);
@@ -54,6 +59,7 @@ function createMain(){
     mainContainer.append(levels);
     main.append(mainContainer);
     main.append(field);
+
     levels.addEventListener("click", changeLevel);
     return main; 
 }
@@ -81,11 +87,13 @@ function createFooter(){
     const footerButton = document.createElement("BUTTON"); 
     footerButton.classList.add("btn");
     footerButton.textContent = "Restart"; 
+
     footerContent.append(time);
     footerContent.append(clicks);
     footerContent.append(bombsText);
     footer.append(footerContent);
     footer.append(footerButton);
+
     footerButton.addEventListener("click", restartGame);
     return footer;
 }
@@ -98,7 +106,9 @@ function createBody(){
     img.src = "free-icon-sun-5903519.png";
     theme.classList.add("theme"); 
     theme.append(img);
+
     theme.addEventListener("click", toggleTheme);
+
     const header = createHeader();
     const main = createMain();
     const footer = createFooter();
@@ -107,11 +117,13 @@ function createBody(){
     wrapper.append(footer);
     document.body.prepend(wrapper); 
     document.body.prepend(theme); 
-    toggleTheme()
+
+    toggleTheme();
 }
 
-createBody()
+createBody();
 
+// Создание поля игры 
 function createGame(w, h, b, cellClass, classField) {
     width = w; 
     height = h; 
@@ -132,89 +144,47 @@ function createGame(w, h, b, cellClass, classField) {
     cells = [...field.children];
 
     field.addEventListener("click", minesweeper);
+    field.addEventListener("contextmenu", markBomb);
 
     timerId = setInterval(() => {
         const time = document.getElementById("time");
         seconds++
         time.textContent = `Time: ${seconds} sec`;
     }, 1000);
-
     return field; 
 }
 
+// Изменение уровня или перезапуск игры 
 function changeLevel(event){
     if(event.target.tagName !== "BUTTON"){
         return;
     }
-    let inputBombs = document.querySelector(".input-bombs").value; 
-    let newField;
-    stopTimer();
-    if(!inputBombs){
-        if(event.target.textContent ==="Easy"){
-            newField =  createGame(10, 10, 10, "cell-small", "field-small");
-        } else if(event.target.textContent ==="Hard"){
-            newField = createGame(25, 25, 25, "cell-big", "field-big");
-        } else {
-            newField = createGame(15, 15, 15, "cell-mid", "field-mid");
-        }
-    } else {
-        if(inputBombs < 10 || inputBombs > 99){
-            createModal("Number of bombs must be in range from 10 to 99!");
-            return;
-        }
-        bombs = +inputBombs;
-        if(event.target.textContent ==="Easy"){
-            newField =  createGame(10, 10, bombs, "cell-small", "field-small");
-        } else if(event.target.textContent ==="Hard"){
-            newField = createGame(25, 25, bombs, "cell-big", "field-big");
-        } else {
-            newField = createGame(15, 15, bombs, "cell-mid", "field-mid");
-        }
-    }
-    const clicks = document.getElementById("clicks");
-    clicks.textContent = `Clicks: ${step}`;
-    const bombsText = document.getElementById("bombsText");
-    bombsText.textContent = `Bombs left: ${bombs}`;
-    const oldField = document.querySelector(".field");
-    oldField.replaceWith(newField);
-}
-
-function createModal(text, isGood){
-    const modal = document.createElement("DIV");
-    modal.classList.add("modal");
-    modal.textContent = text;
-    if(isGood){
-        modal.classList.add("modal_good");
-    } else {
-        modal.classList.add("modal_bad");
-    }
-    document.body.append(modal);
-    modal.addEventListener("click", () => {
-        modal.remove();
-    })
-}
-
-function stopTimer(){
-    clearInterval(timerId);
-    const time = document.getElementById("time");
-    seconds = 0;
-    time.textContent = `Time: ${seconds} sec`;
-}
-
-function isValid(row, column){
-    return row >= 0 && row < height && column >= 0 && column < width; 
+    setLevel(event.target.textContent);
 }
 
 function restartGame(){
-    stopTimer();
     const field = document.querySelector(".field");
     const level = field.classList[1];
+    setLevel(level);
+}
+
+function setLevel(level){
+    stopTimer();
+    const field = document.querySelector(".field");
+    let inputBombs = document.querySelector(".input-bombs").value; 
     let newField;
-    if(level ==="field-small"){
+    if(inputBombs && (inputBombs < 10 || inputBombs > 99)){
+        createModal("Number of bombs must be in range from 10 to 99!");
+        return;
+    }
+    if(level ==="Easy" || level === "field-small"){
+        bombs = inputBombs ? +inputBombs : 10;
         newField =  createGame(10, 10, bombs, "cell-small", "field-small");
-    } else if(level ==="field-big"){
+    } else if(level === "Hard" || level === "field-big"){
+        bombs = inputBombs ? +inputBombs : 25;
         newField = createGame(25, 25, bombs, "cell-big", "field-big");
     } else {
+        bombs = inputBombs ? +inputBombs : 15;
         newField = createGame(15, 15, bombs, "cell-mid", "field-mid");
     }
     const clicks = document.getElementById("clicks");
@@ -222,6 +192,11 @@ function restartGame(){
     const bombsText = document.getElementById("bombsText");
     bombsText.textContent = `Bombs left: ${bombs}`;
     field.replaceWith(newField);
+}
+
+// Функции и дополнительные функции которые срабатывают при ЛКМ или ПКМ
+function isValid(row, column){
+    return row >= 0 && row < height && column >= 0 && column < width; 
 }
 
 function isBomb(row, column) {
@@ -251,6 +226,13 @@ function open(row, column) {
     if(cell.disabled === true) return;
 
     cell.disabled = true;
+    if(cell.classList.contains("cell-mark")){
+        cell.classList.remove("cell-mark");
+        cell.textContent = "";
+        bombs++;
+        const bombsText = document.getElementById("bombsText");
+        bombsText.textContent = `Bombs left: ${bombs}`;
+    }
     if(isBomb(row, column)){
         cell.textContent = "💣";
         cell.classList.add("bomb");
@@ -258,15 +240,17 @@ function open(row, column) {
         createModal(`Game over! You lose! Try again!`);
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
+        field.removeEventListener("contextmenu", markBomb);
         return; 
     }
 
     closedCells--;
     if(closedCells <= bombs) {
         stopTimer();
-        createModal(`Game over! You win for ${seconds} seconds and ${step} times!`, true);
+        createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
+        field.removeEventListener("contextmenu", markBomb);
         return; 
     }
     const count = getCount(row, column); 
@@ -300,15 +284,34 @@ function minesweeper(event) {
         const arrWithoutFirstClick = [...Array(amountOfCells).keys()];
         arrWithoutFirstClick.splice(clickIndex, 1);
         bombIndexesArray = arrWithoutFirstClick.sort(() => Math.random() - 0.5).slice(0, bombs);
+        console.log(bombIndexesArray);
     }
     const column = clickIndex % width; 
     const row = Math.floor(clickIndex / width); 
-    open(row, column);
     step++;
+    open(row, column);
     const clicks = document.getElementById("clicks");
     clicks.textContent = `Clicks: ${step}`;
 }
 
+function markBomb(event){
+    if(event.target.tagName !== "BUTTON") {
+        return; 
+    }
+    event.preventDefault();
+    const clickIndex = cells.indexOf(event.target); 
+    const cell = cells[clickIndex]; 
+    if(cell.disabled === true) {
+        return; 
+    }
+    cell.textContent = "X";
+    cell.classList.add("cell-mark");
+    bombs--;
+    const bombsText = document.getElementById("bombsText");
+    bombsText.textContent = `Bombs left: ${bombs}`;
+}
+
+//Дополнительные функции и модальные окна 
 function toggleTheme(){
     const icon = document.querySelector(".theme");
     const btns = [...document.querySelectorAll(".btn")];
@@ -351,4 +354,32 @@ function toggleTheme(){
         isDarkTheme = true;
         icon.firstElementChild.src = "free-icon-moon-4139157.png";
     }
+}
+
+function stopTimer(){
+    clearInterval(timerId);
+    const time = document.getElementById("time");
+    seconds = 0;
+    time.textContent = `Time: ${seconds} sec`;
+}
+
+function createModal(text, isGood){
+    const modal = document.createElement("DIV");
+    modal.classList.add("modal");
+    modal.textContent = text;
+    if(isGood){
+        modal.classList.add("modal_good");
+    } else {
+        modal.classList.add("modal_bad");
+    }
+    document.body.append(modal);
+    document.body.style.overflow = "hidden";
+    const wrapper = document.querySelector(".wrapper");
+    wrapper.style.opacity = "0.5";
+    modal.addEventListener("click", () => {
+        modal.remove();
+        document.body.style.overflow = "";
+        const wrapper = document.querySelector(".wrapper");
+        wrapper.style.opacity = "1";
+    })
 }

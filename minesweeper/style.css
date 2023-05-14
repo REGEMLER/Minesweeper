@@ -31,6 +31,7 @@ ul,ol,li{
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
+    position: relative;
 }
 
 .header{
@@ -136,6 +137,12 @@ ul,ol,li{
     color: orange;
 }
 
+.cell-mark{
+    border: 2px solid red;
+    color: red;
+    font-weight: 900;
+}
+
 .cell-small {
     height: 3rem;
     font-size: 1.5rem;
@@ -212,14 +219,16 @@ ul,ol,li{
 .modal{
     width: 70%;
     margin: 0 auto;
+    padding: 1rem;
     transform: translate(-50%, -50%);
-    height: 100px;
+    height: 130px;
     position: fixed;
     top: 50%;
     left: 50%;
     background-color: white;
     text-align: center;
     font-size: 2rem;
+    z-index: 20;
 }
 
 .modal_bad{
