@@ -10,6 +10,25 @@ let seconds = 0;
 let closedCells = amountOfCells; 
 let isDarkTheme = true; 
 let timerId = null; 
+let latestResults; 
+
+// LocalStorage
+const setLocalStorage = () => {
+    localStorage.setItem("latestResults", latestResults)
+}
+
+const getLocalStorage = () => {
+    if (localStorage.getItem('latestResults')) {
+        latestResults = localStorage.getItem('latestResults');
+    } else {
+        latestResults = ""; 
+    }
+    console.log(latestResults)
+}
+
+window.addEventListener('beforeunload', setLocalStorage);
+window.addEventListener('load', getLocalStorage);
+
 
 // Создание разметки 
 function createHeader(){
@@ -84,18 +103,46 @@ function createFooter(){
     clicks.classList.add("text");
     clicks.textContent = `Clicks: ${step}`;
     clicks.id = "clicks";
-    const footerButton = document.createElement("BUTTON"); 
-    footerButton.classList.add("btn");
-    footerButton.textContent = "Restart"; 
+    const footerButtons = document.createElement("DIV");
+    footerButtons.classList.add("footer-buttons");
+    const footerButton1 = document.createElement("BUTTON"); 
+    footerButton1.classList.add("btn");
+    footerButton1.textContent = "Restart"; 
+    const footerButton2 = document.createElement("BUTTON"); 
+    footerButton2.classList.add("btn");
+    footerButton2.textContent = "Save Game"; 
+    const footerButton3 = document.createElement("BUTTON"); 
+    footerButton3.classList.add("btn");
+    footerButton3.textContent = "Last 10"; 
+
+    footerButtons.append(footerButton1);
+    footerButtons.append(footerButton2);
+    footerButtons.append(footerButton3);
 
     footerContent.append(time);
     footerContent.append(clicks);
     footerContent.append(bombsText);
     footer.append(footerContent);
-    footer.append(footerButton);
+    footer.append(footerButtons);
 
-    footerButton.addEventListener("click", restartGame);
+    footerButton1.addEventListener("click", restartGame);
+    footerButton2.addEventListener("click", stopTimer);
+    footerButton3.addEventListener("click", () => {
+        const results = document.querySelector(".results"); 
+        results.classList.add("results-visible"); 
+    });
     return footer;
+}
+
+function createResults(){
+    const list = document.createElement("UL");
+    list.classList.add("results");
+    for(let i = 0; i < 11; i++) {
+        const li = document.createElement("LI");
+        li.classList.add("text");
+        list.append(li); 
+    }
+    return list; 
 }
 
 function createBody(){
@@ -112,11 +159,18 @@ function createBody(){
     const header = createHeader();
     const main = createMain();
     const footer = createFooter();
+    const list = createResults();
+    
+    list.addEventListener("click", () => {
+        list.classList.remove("results-visible"); 
+    })
+
     wrapper.append(header);
     wrapper.append(main);
     wrapper.append(footer);
     document.body.prepend(wrapper); 
     document.body.prepend(theme); 
+    document.body.prepend(list); 
 
     toggleTheme();
     sound("start.mp3");
@@ -249,6 +303,7 @@ function open(row, column) {
 
     closedCells--;
     if(closedCells <= bombs) {
+        setResult();
         stopTimer();
         createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
         const field = document.querySelector(".field");
@@ -304,12 +359,12 @@ function markBomb(event){
         return; 
     }
     event.preventDefault();
-    sound("flag.mp3");
     const clickIndex = cells.indexOf(event.target); 
     const cell = cells[clickIndex]; 
     if(cell.disabled === true) {
         return; 
     }
+    sound("flag.mp3");
     cell.textContent = "X";
     cell.classList.add("cell-mark");
     bombs--;
@@ -394,4 +449,23 @@ function sound(src){
     const audio = new Audio();
     audio.src = src;
     audio.play(); 
+}
+
+function setResult(){
+    const date = new Date().toLocaleTimeString();
+    let stringResult = `${date} -  ${step} cliks and ${seconds} seconds;`;
+    latestResults += stringResult; 
+    let arr = latestResults.split(";");
+    arr.pop(); 
+    console.log(arr)
+    if(arr.length > 10){
+        arr.pop(); 
+    }
+    const results = document.querySelector(".results"); 
+    arr.forEach((item, index) => {
+        results.children[index].textContent = `${index + 1}) ${item}`
+    })
+    latestResults = "";
+    let newString = arr.join(";");
+    latestResults = newString;
 }
