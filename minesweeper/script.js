@@ -8,7 +8,7 @@ let cells = [];
 let step = 0;
 let seconds = 0;
 let closedCells = amountOfCells; 
-let isDarkTheme = true; 
+let isDarkTheme = false; 
 let timerId = null; 
 let latestResults; 
 
@@ -23,7 +23,12 @@ const getLocalStorage = () => {
     } else {
         latestResults = ""; 
     }
-    console.log(latestResults)
+    const list = createResults();
+    document.body.append(list); 
+    list.addEventListener("click", () => {
+        list.classList.remove("results-visible"); 
+    })
+    sound("start.mp3");
 }
 
 window.addEventListener('beforeunload', setLocalStorage);
@@ -58,17 +63,25 @@ function createMain(){
     levels.classList.add("level");
     const easyButton = document.createElement("BUTTON"); 
     easyButton.classList.add("btn");
+    easyButton.classList.add("bg_dark");
+    easyButton.classList.add("text_light");
     easyButton.textContent = "Easy";
     const mediumButton = document.createElement("BUTTON"); 
     mediumButton.classList.add("btn");
+    mediumButton.classList.add("bg_dark");
+    mediumButton.classList.add("text_light");
     mediumButton.textContent = "Medium";
     const hardButton = document.createElement("BUTTON"); 
     hardButton.classList.add("btn");
+    hardButton.classList.add("bg_dark");
+    hardButton.classList.add("text_light");
     hardButton.textContent = "Hard";
     const inputBombs = document.createElement("INPUT");
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
     inputBombs.classList.add("input-bombs");
+    inputBombs.classList.add("text_light");
+    inputBombs.classList.add("bg_dark");
 
     levels.append(easyButton);
     levels.append(mediumButton);
@@ -107,13 +120,19 @@ function createFooter(){
     footerButtons.classList.add("footer-buttons");
     const footerButton1 = document.createElement("BUTTON"); 
     footerButton1.classList.add("btn");
+    footerButton1.classList.add("bg_dark");
+    footerButton1.classList.add("text_light");
     footerButton1.textContent = "Restart"; 
     const footerButton2 = document.createElement("BUTTON"); 
     footerButton2.classList.add("btn");
+    footerButton2.classList.add("bg_dark");
+    footerButton2.classList.add("text_light");
     footerButton2.textContent = "Save Game"; 
     const footerButton3 = document.createElement("BUTTON"); 
     footerButton3.classList.add("btn");
     footerButton3.textContent = "Last 10"; 
+    footerButton3.classList.add("bg_dark");
+    footerButton3.classList.add("text_light");
 
     footerButtons.append(footerButton1);
     footerButtons.append(footerButton2);
@@ -137,11 +156,16 @@ function createFooter(){
 function createResults(){
     const list = document.createElement("UL");
     list.classList.add("results");
-    for(let i = 0; i < 11; i++) {
+    for(let i = 0; i < 10; i++){
         const li = document.createElement("LI");
         li.classList.add("text");
-        list.append(li); 
+        list.append(li);
     }
+    let arr = latestResults.split(";");
+    arr.forEach((item, index) => {
+        if(item == "") return; 
+        list.children[index].textContent = `${index + 1}) ${item}`
+    })
     return list; 
 }
 
@@ -154,26 +178,17 @@ function createBody(){
     theme.classList.add("theme"); 
     theme.append(img);
 
-    theme.addEventListener("click", toggleTheme);
-
     const header = createHeader();
     const main = createMain();
     const footer = createFooter();
-    const list = createResults();
     
-    list.addEventListener("click", () => {
-        list.classList.remove("results-visible"); 
-    })
-
     wrapper.append(header);
     wrapper.append(main);
     wrapper.append(footer);
     document.body.prepend(wrapper); 
     document.body.prepend(theme); 
-    document.body.prepend(list); 
 
-    toggleTheme();
-    sound("start.mp3");
+    theme.addEventListener("click", toggleTheme);
 }
 
 createBody();
@@ -290,26 +305,27 @@ function open(row, column) {
         bombsText.textContent = `Bombs left: ${bombs}`;
     }
     if(isBomb(row, column)){
+        setResult("Lose");
         cell.textContent = "💣";
         cell.classList.add("bomb");
-        stopTimer();
         createModal(`Game over! You lose! Try again!`);
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
         field.removeEventListener("contextmenu", markBomb);
         sound("lose.mp3");
+        stopTimer();
         return; 
     }
 
     closedCells--;
     if(closedCells <= bombs) {
-        setResult();
-        stopTimer();
+        setResult("Win");
         createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
         field.removeEventListener("contextmenu", markBomb);
         sound("win.mp3");
+        stopTimer();
         return; 
     }
     const count = getCount(row, column); 
@@ -365,7 +381,7 @@ function markBomb(event){
         return; 
     }
     sound("flag.mp3");
-    cell.textContent = "X";
+    cell.textContent = "🚩";
     cell.classList.add("cell-mark");
     bombs--;
     const bombsText = document.getElementById("bombsText");
@@ -378,8 +394,11 @@ function toggleTheme(){
     const btns = [...document.querySelectorAll(".btn")];
     const texts = [...document.querySelectorAll(".text")];
     const input = document.querySelector(".input-bombs");
+    const results = document.querySelector(".results")
     if(isDarkTheme){
         document.body.style.backgroundColor = "#7e86b4";
+        results.classList.remove("results-dark");
+        results.classList.remove("results-white-text");
         input.classList.remove("bg_light");
         input.classList.add("bg_dark");
         input.classList.remove("text_dark");
@@ -398,6 +417,8 @@ function toggleTheme(){
         icon.firstElementChild.src = "free-icon-sun-5903519.png";
     } else {
         document.body.style.backgroundColor = "#232529";
+        results.classList.add("results-dark");
+        results.classList.add("results-white-text");
         input.classList.add("bg_light");
         input.classList.remove("bg_dark");
         input.classList.add("text_dark");
@@ -428,6 +449,10 @@ function createModal(text, isGood){
     const modal = document.createElement("DIV");
     modal.classList.add("modal");
     modal.textContent = text;
+    const X = document.createElement("SPAN");
+    X.textContent = "X";
+    X.classList.add("modal-x");
+    modal.append(X);
     if(isGood){
         modal.classList.add("modal_good");
     } else {
@@ -451,20 +476,26 @@ function sound(src){
     audio.play(); 
 }
 
-function setResult(){
-    const date = new Date().toLocaleTimeString();
-    let stringResult = `${date} -  ${step} cliks and ${seconds} seconds;`;
+function setResult(status){
+    const date = new Date();
+    const time = date.toLocaleString();
+    let stringResult; 
+    if(status === "Win"){
+        stringResult = `${time} - You win for ${step} cliks and ${seconds} seconds;`;
+    } else {
+        stringResult = `${time} - You lose;`;
+    }
     latestResults += stringResult; 
     let arr = latestResults.split(";");
-    arr.pop(); 
-    console.log(arr)
-    if(arr.length > 10){
-        arr.pop(); 
+    if(arr[0] == "") arr.shift(); 
+    if(arr.length > 11){
+        arr.shift(); 
     }
     const results = document.querySelector(".results"); 
     arr.forEach((item, index) => {
-        results.children[index].textContent = `${index + 1}) ${item}`
-    })
+        if(item == "") return; 
+        results.children[index].textContent = `${index + 1}) ${item}`;
+    });
     latestResults = "";
     let newString = arr.join(";");
     latestResults = newString;

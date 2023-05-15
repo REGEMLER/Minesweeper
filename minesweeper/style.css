@@ -193,6 +193,7 @@ ul,ol,li{
     position: fixed;
     top: 5%;
     right: 5%;
+    z-index: 50;
 }
 
 .theme img{
@@ -237,6 +238,7 @@ ul,ol,li{
     text-align: center;
     font-size: 2rem;
     z-index: 20;
+    cursor: pointer;
 }
 
 .modal_bad{
@@ -251,28 +253,55 @@ ul,ol,li{
     border-radius: 40px;
 }
 
+.modal-x{
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    cursor: pointer;
+}
+
+
 .results{
-    width: 65%;
+    width: 50%;
     margin: 0 auto;
     padding: 1rem;
     transform: translate(-50%, -50%);
-    height: 400px;
+    min-height: 400px;
     position: fixed;
     top: 50%;
     left: 50%;
     background-color: #ccc;
     font-size: 1.2rem;
-    text-align: center;
-    font-size: 2rem;
     border-radius: 5px;
-    z-index: 20;
     opacity: 0;
+    text-align: justify;
     visibility: hidden;
+}
+
+.results::after{
+    content: "X";
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    cursor: pointer;
+}
+
+.results li{
+    margin-bottom: 10px;
 }
 
 .results-visible{
     opacity: 1;
     visibility: visible; 
+    z-index: 20;
+}
+
+.results-dark{
+    background-color: rgb(58, 58, 37);
+}
+
+.results-white-text{
+    color: white;
 }
 
 @media screen and (max-width:767px) {
@@ -304,5 +333,8 @@ ul,ol,li{
         width: 100px;
         height: 30px;
         border-radius: 5px;
+    }
+    .results{
+        width: 65%;
     }
 }
