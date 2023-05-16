@@ -11,6 +11,7 @@ let closedCells = amountOfCells;
 let isDarkTheme = false; 
 let timerId = null; 
 let latestResults; 
+let isSaved = "";
 
 // LocalStorage
 const setLocalStorage = () => {
@@ -28,6 +29,9 @@ const getLocalStorage = () => {
     list.addEventListener("click", () => {
         list.classList.remove("results-visible"); 
     })
+    if(localStorage.getItem('isSaved')){
+        loadGame()
+    }
 }
 
 window.addEventListener('beforeunload', setLocalStorage);
@@ -104,8 +108,11 @@ function createFooter(){
     const footerButton2 = document.createElement("BUTTON"); 
     footerButton2.className = "btn bg_dark text_light";
     footerButton2.textContent = "Last 10"; 
+    const footerButton3 = document.createElement("BUTTON"); 
+    footerButton3.className = "btn bg_dark text_light";
+    footerButton3.textContent = "Save"; 
 
-    footerButtons.append(footerButton1, footerButton2);
+    footerButtons.append(footerButton1, footerButton2, footerButton3);
     footerContent.append(time, clicks, bombsText);
     footer.append(footerContent, footerButtons);
 
@@ -114,6 +121,7 @@ function createFooter(){
         const results = document.querySelector(".results"); 
         results.classList.add("results-visible"); 
     });
+    footerButton3.addEventListener("click", saveGame);
 
     return footer;
 }
@@ -225,6 +233,8 @@ function setLevel(level){
     bombsText.textContent = `Bombs left: ${bombs}`;
     field.replaceWith(newField);
     sound("start.mp3");
+    isSaved = "";
+    localStorage.removeItem("isSaved");
 }
 
 // Функции и дополнительные функции которые срабатывают при ЛКМ или ПКМ
@@ -258,6 +268,8 @@ function win(){
     field.removeEventListener("contextmenu", markBomb);
     sound("win.mp3");
     stopTimer();
+    isSaved = "";
+    localStorage.removeItem("isSaved");
 }
 
 function lose(cell){
@@ -269,6 +281,8 @@ function lose(cell){
     field.removeEventListener("contextmenu", markBomb);
     sound("lose.mp3");
     stopTimer();
+    isSaved = "";
+    localStorage.removeItem("isSaved");
     cells.forEach((item, index) => {
         if(bombIndexesArray.includes(index)){
             if(item.dataset.flag === "on"){
@@ -330,7 +344,6 @@ function minesweeper(event) {
         const arrWithoutFirstClick = [...Array(amountOfCells).keys()];
         arrWithoutFirstClick.splice(clickIndex, 1);
         bombIndexesArray = arrWithoutFirstClick.sort(() => Math.random() - 0.5).slice(0, bombs);
-        console.log(bombIndexesArray);
     }
     const column = clickIndex % width; 
     const row = Math.floor(clickIndex / width); 
@@ -475,4 +488,53 @@ function setResult(){
     latestResults = "";
     let newString = arr.join(";");
     latestResults = newString;
+}
+
+function saveGame(){
+    let localWidth = width; 
+    let localHeight = height; 
+    let localBombs = bombs; 
+    let localBombIndexesArray = [...bombIndexesArray].join(",");
+    let localStep = step;
+    let localSeconds = seconds;
+    let localField = document.querySelector(".field").innerHTML; 
+    let localClosedCells = closedCells;
+    localStorage.setItem("localWidth", localWidth);
+    localStorage.setItem("localHeight", localHeight);
+    localStorage.setItem("localBombs", localBombs);
+    localStorage.setItem("localBombIndexesArray", localBombIndexesArray);
+    localStorage.setItem("localStep", localStep);
+    localStorage.setItem("localSeconds", localSeconds);
+    localStorage.setItem("localField", localField);
+    localStorage.setItem("localClosedCells", localClosedCells);
+    localStorage.setItem("isSaved", true);
+    createModal("Saved! The game will be loaded after reloading the page", true);
+    sound("flag.mp3");
+}
+
+function loadGame(){
+    clearInterval(timerId);
+    width = localStorage.getItem('localWidth'); 
+    height = localStorage.getItem('localHeight'); 
+    bombs = localStorage.getItem('localBombs'); 
+    amountOfCells = width*height; 
+    let tempArr = localStorage.getItem('localBombIndexesArray').split(","); 
+    bombIndexesArray = tempArr.map(item => +item); 
+    step = localStorage.getItem('localStep'); 
+    seconds = localStorage.getItem('localSeconds'); 
+    const field = document.querySelector(".field"); 
+    field.innerHTML = localStorage.getItem('localField'); 
+    closedCells = localStorage.getItem('localClosedCells'); 
+    cells = [...field.children];
+    const time = document.getElementById("time");
+    time.textContent = `Time: ${seconds} sec`;
+    const bombsText = document.getElementById("bombsText");
+    bombsText.textContent = `Bombs left: ${bombs}`;
+    const clicks = document.getElementById("clicks");
+    clicks.textContent = `Clicks: ${step}`;
+    timerId = setInterval(() => {
+        const time = document.getElementById("time");
+        seconds++
+        time.textContent = `Time: ${seconds} sec`;
+    }, 1000);
 }
