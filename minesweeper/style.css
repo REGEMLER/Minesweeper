@@ -320,21 +320,21 @@ ul,ol,li{
     }
     .cell-big {
         height: 1rem;
-        font-size: 1rem;
+        font-size: 0.8rem;
     }
     .field-mid {
         grid-template-columns: repeat(15, 1.5rem);
     }
     .cell-mid {
         height: 1.5rem;
-        font-size: 0.5rem;
+        font-size: 1rem;
     }
     .field-small {
         grid-template-columns: repeat(10, 2rem);
     }
     .cell-small {
         height: 2rem;
-        font-size: 0.5rem;
+        font-size: 1rem;
     }
     .footer-text{
         font-size: 1rem;
