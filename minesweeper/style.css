@@ -239,6 +239,9 @@ ul,ol,li{
     font-size: 2rem;
     z-index: 20;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal_bad{
@@ -309,6 +312,9 @@ ul,ol,li{
 }
 
 @media screen and (max-width:767px) {
+    .title{
+        font-size: 1.5rem;
+    }
     .field-big {
         grid-template-columns: repeat(25, 1rem);
     }
@@ -333,12 +339,26 @@ ul,ol,li{
     .footer-text{
         font-size: 1rem;
     }
+    .footer-buttons{
+        width: 95%;
+    }
     .btn{
-        width: 100px;
+        width: 80px;
         height: 30px;
         border-radius: 5px;
+        font-size: 0.8rem;
+    }
+    .input-bombs{
+        width: 80px;
+        height: 30px;
+        border-radius: 5px;
+        font-size: 0.8rem;
     }
     .results{
         width: 65%;
+    }
+    .modal{
+        width: 80%;
+        font-size: 1.5rem;
     }
 }

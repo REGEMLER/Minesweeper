@@ -14,7 +14,7 @@ let latestResults;
 
 // LocalStorage
 const setLocalStorage = () => {
-    localStorage.setItem("latestResults", latestResults)
+    localStorage.setItem("latestResults", latestResults);
 }
 
 const getLocalStorage = () => {
@@ -28,20 +28,17 @@ const getLocalStorage = () => {
     list.addEventListener("click", () => {
         list.classList.remove("results-visible"); 
     })
-    sound("start.mp3");
 }
 
 window.addEventListener('beforeunload', setLocalStorage);
 window.addEventListener('load', getLocalStorage);
-
 
 // Создание разметки 
 function createHeader(){
     const header = document.createElement("HEADER");
     header.classList.add("header");
     const h1 = document.createElement("H1");
-    h1.classList.add("title"); 
-    h1.classList.add("text"); 
+    h1.className = "title text";
     h1.textContent = "Welcome to Minesweeper"; 
     header.append(h1); 
     return header; 
@@ -56,41 +53,27 @@ function createMain(){
     const mainContainer = document.createElement("DIV");
     mainContainer.classList.add("main-container")
     const mainDescription = document.createElement("H2");
-    mainDescription.classList.add("main-description");
-    mainDescription.classList.add("text");
+    mainDescription.className = "main-description text";
     mainDescription.textContent = "Select level and the number of bombs";
     const levels = document.createElement("DIV");
     levels.classList.add("level");
     const easyButton = document.createElement("BUTTON"); 
-    easyButton.classList.add("btn");
-    easyButton.classList.add("bg_dark");
-    easyButton.classList.add("text_light");
+    easyButton.className = "btn bg_dark text_light";
     easyButton.textContent = "Easy";
     const mediumButton = document.createElement("BUTTON"); 
-    mediumButton.classList.add("btn");
-    mediumButton.classList.add("bg_dark");
-    mediumButton.classList.add("text_light");
+    mediumButton.className = "btn bg_dark text_light";
     mediumButton.textContent = "Medium";
     const hardButton = document.createElement("BUTTON"); 
-    hardButton.classList.add("btn");
-    hardButton.classList.add("bg_dark");
-    hardButton.classList.add("text_light");
+    hardButton.className = "btn bg_dark text_light";
     hardButton.textContent = "Hard";
     const inputBombs = document.createElement("INPUT");
     inputBombs.setAttribute("type", "number");
     inputBombs.setAttribute("placeholder", "bombs");
-    inputBombs.classList.add("input-bombs");
-    inputBombs.classList.add("text_light");
-    inputBombs.classList.add("bg_dark");
+    inputBombs.className = "input-bombs bg_dark text_light";
 
-    levels.append(easyButton);
-    levels.append(mediumButton);
-    levels.append(hardButton);
-    levels.append(inputBombs);
-    mainContainer.append(mainDescription);
-    mainContainer.append(levels);
-    main.append(mainContainer);
-    main.append(field);
+    levels.append(easyButton, mediumButton, hardButton, inputBombs);
+    mainContainer.append(mainDescription, levels);
+    main.append(mainContainer, field);
 
     levels.addEventListener("click", changeLevel);
     return main; 
@@ -102,54 +85,36 @@ function createFooter(){
     const footerContent = document.createElement("DIV");
     footerContent.classList.add("footer-content");
     const time = document.createElement("H2");
-    time.classList.add("footer-text");
-    time.classList.add("text");
+    time.className = "footer-text text";
     time.textContent = `Time: ${seconds} sec`;
     time.id = "time";
     const bombsText = document.createElement("H2");
-    bombsText.classList.add("footer-text");
-    bombsText.classList.add("text");
+    bombsText.className = "footer-text text";
     bombsText.textContent = `Bombs left: ${bombs}`;
     bombsText.id = "bombsText";
     const clicks = document.createElement("H2");
-    clicks.classList.add("footer-text");
-    clicks.classList.add("text");
+    clicks.className = "footer-text text";
     clicks.textContent = `Clicks: ${step}`;
     clicks.id = "clicks";
     const footerButtons = document.createElement("DIV");
     footerButtons.classList.add("footer-buttons");
     const footerButton1 = document.createElement("BUTTON"); 
-    footerButton1.classList.add("btn");
-    footerButton1.classList.add("bg_dark");
-    footerButton1.classList.add("text_light");
+    footerButton1.className = "btn bg_dark text_light";
     footerButton1.textContent = "Restart"; 
     const footerButton2 = document.createElement("BUTTON"); 
-    footerButton2.classList.add("btn");
-    footerButton2.classList.add("bg_dark");
-    footerButton2.classList.add("text_light");
-    footerButton2.textContent = "Save Game"; 
-    const footerButton3 = document.createElement("BUTTON"); 
-    footerButton3.classList.add("btn");
-    footerButton3.textContent = "Last 10"; 
-    footerButton3.classList.add("bg_dark");
-    footerButton3.classList.add("text_light");
+    footerButton2.className = "btn bg_dark text_light";
+    footerButton2.textContent = "Last 10"; 
 
-    footerButtons.append(footerButton1);
-    footerButtons.append(footerButton2);
-    footerButtons.append(footerButton3);
-
-    footerContent.append(time);
-    footerContent.append(clicks);
-    footerContent.append(bombsText);
-    footer.append(footerContent);
-    footer.append(footerButtons);
+    footerButtons.append(footerButton1, footerButton2);
+    footerContent.append(time, clicks, bombsText);
+    footer.append(footerContent, footerButtons);
 
     footerButton1.addEventListener("click", restartGame);
-    footerButton2.addEventListener("click", stopTimer);
-    footerButton3.addEventListener("click", () => {
+    footerButton2.addEventListener("click", () => {
         const results = document.querySelector(".results"); 
         results.classList.add("results-visible"); 
     });
+
     return footer;
 }
 
@@ -182,11 +147,8 @@ function createBody(){
     const main = createMain();
     const footer = createFooter();
     
-    wrapper.append(header);
-    wrapper.append(main);
-    wrapper.append(footer);
-    document.body.prepend(wrapper); 
-    document.body.prepend(theme); 
+    wrapper.append(header, main, footer);
+    document.body.prepend(wrapper, theme); 
 
     theme.addEventListener("click", toggleTheme);
 }
@@ -288,6 +250,35 @@ function getCount(row, column) {
     return count; 
 }
 
+function win(){
+    setResult();
+    createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
+    const field = document.querySelector(".field");
+    field.removeEventListener("click", minesweeper);
+    field.removeEventListener("contextmenu", markBomb);
+    sound("win.mp3");
+    stopTimer();
+}
+
+function lose(cell){
+    cell.textContent = "💣";
+    cell.classList.add("bomb");
+    createModal(`Game over! You lose! Try again!`);
+    const field = document.querySelector(".field");
+    field.removeEventListener("click", minesweeper);
+    field.removeEventListener("contextmenu", markBomb);
+    sound("lose.mp3");
+    stopTimer();
+    cells.forEach((item, index) => {
+        if(bombIndexesArray.includes(index)){
+            if(item.dataset.flag === "on"){
+                item.classList.add("destroyed-bomb")
+            }
+            item.textContent = "💣";
+        } 
+    })
+}
+
 function open(row, column) {
     if(!isValid(row, column)) return; 
 
@@ -297,41 +288,14 @@ function open(row, column) {
     if(cell.disabled === true || cell.dataset.flag === "on") return;
 
     cell.disabled = true;
-    if(cell.classList.contains("cell-mark")){
-        cell.classList.remove("cell-mark");
-        cell.textContent = "";
-        bombs++;
-        const bombsText = document.getElementById("bombsText");
-        bombsText.textContent = `Bombs left: ${bombs}`;
-    }
     if(isBomb(row, column)){
-        cell.textContent = "💣";
-        cell.classList.add("bomb");
-        createModal(`Game over! You lose! Try again!`);
-        const field = document.querySelector(".field");
-        field.removeEventListener("click", minesweeper);
-        field.removeEventListener("contextmenu", markBomb);
-        sound("lose.mp3");
-        stopTimer();
-        cells.forEach((item, index) => {
-            if(bombIndexesArray.includes(index)){
-                if(item.dataset.flag === "on"){
-                    item.classList.add("destroyed-bomb")
-                }
-                item.textContent = "💣";
-            } 
-        })
+        lose(cell);
         return; 
     }
+
     closedCells--;
     if(closedCells <= bombs) {
-        setResult();
-        createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
-        const field = document.querySelector(".field");
-        field.removeEventListener("click", minesweeper);
-        field.removeEventListener("contextmenu", markBomb);
-        sound("win.mp3");
-        stopTimer();
+        win();
         return; 
     }
     const count = getCount(row, column); 
