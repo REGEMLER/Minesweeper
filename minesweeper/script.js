@@ -252,7 +252,7 @@ function getCount(row, column) {
 
 function win(){
     setResult();
-    createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
+    createModal(`Hooray! You found all mines in ${seconds} seconds and ${step} moves!`, true);
     const field = document.querySelector(".field");
     field.removeEventListener("click", minesweeper);
     field.removeEventListener("contextmenu", markBomb);
