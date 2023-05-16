@@ -304,6 +304,10 @@ ul,ol,li{
     color: white;
 }
 
+.destroyed-bomb{
+    border: 2px solid red;
+}
+
 @media screen and (max-width:767px) {
     .field-big {
         grid-template-columns: repeat(25, 1rem);

@@ -294,7 +294,7 @@ function open(row, column) {
     const clickedIndex = row * width + column;
     const cell = cells[clickedIndex]; 
 
-    if(cell.disabled === true) return;
+    if(cell.disabled === true || cell.dataset.flag === "on") return;
 
     cell.disabled = true;
     if(cell.classList.contains("cell-mark")){
@@ -305,7 +305,6 @@ function open(row, column) {
         bombsText.textContent = `Bombs left: ${bombs}`;
     }
     if(isBomb(row, column)){
-        setResult("Lose");
         cell.textContent = "💣";
         cell.classList.add("bomb");
         createModal(`Game over! You lose! Try again!`);
@@ -314,12 +313,19 @@ function open(row, column) {
         field.removeEventListener("contextmenu", markBomb);
         sound("lose.mp3");
         stopTimer();
+        cells.forEach((item, index) => {
+            if(bombIndexesArray.includes(index)){
+                if(item.dataset.flag === "on"){
+                    item.classList.add("destroyed-bomb")
+                }
+                item.textContent = "💣";
+            } 
+        })
         return; 
     }
-
     closedCells--;
     if(closedCells <= bombs) {
-        setResult("Win");
+        setResult();
         createModal(`Game over! You win for ${seconds} seconds and ${step} clicks!`, true);
         const field = document.querySelector(".field");
         field.removeEventListener("click", minesweeper);
@@ -350,7 +356,7 @@ function open(row, column) {
 }
 
 function minesweeper(event) {
-    if(event.target.tagName !== "BUTTON") {
+    if(event.target.tagName !== "BUTTON" || event.target.disabled === true || event.target.dataset.flag === "on") {
         return; 
     }
     sound("click.mp3");
@@ -380,12 +386,23 @@ function markBomb(event){
     if(cell.disabled === true) {
         return; 
     }
-    sound("flag.mp3");
-    cell.textContent = "🚩";
-    cell.classList.add("cell-mark");
-    bombs--;
-    const bombsText = document.getElementById("bombsText");
-    bombsText.textContent = `Bombs left: ${bombs}`;
+    if( cell.dataset.flag !== "on"){
+        sound("flag.mp3");
+        cell.textContent = "🚩";
+        cell.classList.add("cell-mark");
+        bombs--;
+        const bombsText = document.getElementById("bombsText");
+        bombsText.textContent = `Bombs left: ${bombs}`;
+        cell.dataset.flag = "on";
+    } else {
+        sound("flag.mp3");
+        cell.textContent = "";
+        cell.classList.remove("cell-mark");
+        bombs++;
+        const bombsText = document.getElementById("bombsText");
+        bombsText.textContent = `Bombs left: ${bombs}`;
+        cell.dataset.flag = "";
+    }
 }
 
 //Дополнительные функции и модальные окна 
@@ -476,15 +493,10 @@ function sound(src){
     audio.play(); 
 }
 
-function setResult(status){
+function setResult(){
     const date = new Date();
     const time = date.toLocaleString();
-    let stringResult; 
-    if(status === "Win"){
-        stringResult = `${time} - You win for ${step} cliks and ${seconds} seconds;`;
-    } else {
-        stringResult = `${time} - You lose;`;
-    }
+    let stringResult = `${time} - You win for ${step} cliks and ${seconds} seconds;`;; 
     latestResults += stringResult; 
     let arr = latestResults.split(";");
     if(arr[0] == "") arr.shift(); 
