@@ -2,6 +2,7 @@
 let width = 10; 
 let height = 10; 
 let bombs = 10; 
+let dasplayBombs = bombs; 
 let amountOfCells = width*height; 
 let bombIndexesArray = [];
 let cells = [];
@@ -94,7 +95,7 @@ function createFooter(){
     time.id = "time";
     const bombsText = document.createElement("H2");
     bombsText.className = "footer-text text";
-    bombsText.textContent = `Bombs left: ${bombs}`;
+    bombsText.textContent = `Bombs left: ${dasplayBombs}`;
     bombsText.id = "bombsText";
     const clicks = document.createElement("H2");
     clicks.className = "footer-text text";
@@ -168,6 +169,7 @@ function createGame(w, h, b, cellClass, classField) {
     width = w; 
     height = h; 
     bombs = b; 
+    dasplayBombs = b; 
     amountOfCells = width*height; 
     closedCells = amountOfCells; 
     step = 0;
@@ -230,7 +232,7 @@ function setLevel(level){
     const clicks = document.getElementById("clicks");
     clicks.textContent = `Clicks: ${step}`;
     const bombsText = document.getElementById("bombsText");
-    bombsText.textContent = `Bombs left: ${bombs}`;
+    bombsText.textContent = `Bombs left: ${dasplayBombs}`;
     field.replaceWith(newField);
     sound("start.mp3");
     isSaved = "";
@@ -367,17 +369,17 @@ function markBomb(event){
         sound("flag.mp3");
         cell.textContent = "🚩";
         cell.classList.add("cell-mark");
-        bombs--;
+        dasplayBombs--;
         const bombsText = document.getElementById("bombsText");
-        bombsText.textContent = `Bombs left: ${bombs}`;
+        bombsText.textContent = `Bombs left: ${dasplayBombs}`;
         cell.dataset.flag = "on";
     } else {
         sound("flag.mp3");
         cell.textContent = "";
         cell.classList.remove("cell-mark");
-        bombs++;
+        dasplayBombs++;
         const bombsText = document.getElementById("bombsText");
-        bombsText.textContent = `Bombs left: ${bombs}`;
+        bombsText.textContent = `Bombs left: ${dasplayBombs}`;
         cell.dataset.flag = "";
     }
 }
@@ -503,6 +505,7 @@ function saveGame(){
     let localSeconds = seconds;
     let localField = document.querySelector(".field").innerHTML; 
     let localClosedCells = closedCells;
+    let localDasplayBombs = dasplayBombs;
     localStorage.setItem("localWidth", localWidth);
     localStorage.setItem("localHeight", localHeight);
     localStorage.setItem("localBombs", localBombs);
@@ -511,6 +514,7 @@ function saveGame(){
     localStorage.setItem("localSeconds", localSeconds);
     localStorage.setItem("localField", localField);
     localStorage.setItem("localClosedCells", localClosedCells);
+    localStorage.setItem("localDasplayBombs", localDasplayBombs);
     localStorage.setItem("isSaved", true);
     createModal("Saved! The game will be loaded after reloading the page", true);
     sound("flag.mp3");
@@ -521,6 +525,7 @@ function loadGame(){
     width = localStorage.getItem('localWidth'); 
     height = localStorage.getItem('localHeight'); 
     bombs = localStorage.getItem('localBombs'); 
+    dasplayBombs = localStorage.getItem('localDasplayBombs'); 
     amountOfCells = width*height; 
     let tempArr = localStorage.getItem('localBombIndexesArray').split(","); 
     bombIndexesArray = tempArr.map(item => +item); 
@@ -533,7 +538,7 @@ function loadGame(){
     const time = document.getElementById("time");
     time.textContent = `Time: ${seconds} sec`;
     const bombsText = document.getElementById("bombsText");
-    bombsText.textContent = `Bombs left: ${bombs}`;
+    bombsText.textContent = `Bombs left: ${dasplayBombs}`;
     const clicks = document.getElementById("clicks");
     clicks.textContent = `Clicks: ${step}`;
     timerId = setInterval(() => {
