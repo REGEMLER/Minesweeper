@@ -491,6 +491,10 @@ function setResult(){
 }
 
 function saveGame(){
+    if(seconds == 0){
+        createModal("Error! You cannot save this game");
+        return; 
+    }
     let localWidth = width; 
     let localHeight = height; 
     let localBombs = bombs; 
