@@ -187,7 +187,7 @@ function createGame(w, h, b, cellClass, classField) {
 
     field.addEventListener("click", minesweeper);
     field.addEventListener("contextmenu", markBomb);
-
+    seconds = 0;
     timerId = setInterval(() => {
         const time = document.getElementById("time");
         seconds++
@@ -233,6 +233,8 @@ function setLevel(level){
     clicks.textContent = `Clicks: ${step}`;
     const bombsText = document.getElementById("bombsText");
     bombsText.textContent = `Bombs left: ${dasplayBombs}`;
+    const time = document.getElementById("time");
+    time.textContent = `Time: ${seconds} sec`;
     field.replaceWith(newField);
     sound("start.mp3");
     isSaved = "";
@@ -436,9 +438,6 @@ function toggleTheme(){
 
 function stopTimer(){
     clearInterval(timerId);
-    const time = document.getElementById("time");
-    seconds = 0;
-    time.textContent = `Time: ${seconds} sec`;
 }
 
 function createModal(text, isGood){
