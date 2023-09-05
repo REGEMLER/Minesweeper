@@ -1,6 +1,6 @@
-# Minesweeper - 
+# Minesweeper 
 ## Task
-I have implemented a classic game — [Result](<https://regemler.github.io/Minesweeper/minesweeper/>)
+I have implemented a classic game — [Minesweeper](<https://regemler.github.io/Minesweeper/minesweeper/>)
 
 ### Game rules
 
